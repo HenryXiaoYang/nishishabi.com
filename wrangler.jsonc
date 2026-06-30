@@ -4,6 +4,9 @@
   "main": "src/index.js",
   "compatibility_date": "2025-06-01",
 
+  // 启用 Node.js 兼容，用 node:punycode 解码中文域名
+  "compatibility_flags": ["nodejs_compat"],
+
   // 通配路由：单个 Worker 接管所有二级域名 + apex
   // wrangler 接受 Unicode 的 pattern / zone_name，部署时自动转 punycode
   "routes": [

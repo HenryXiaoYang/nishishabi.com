@@ -6,6 +6,8 @@
  * 纯动态、无存储。「创建」= 访客在首页输入一个新名字并跳转。
  */
 
+import { toUnicode } from "node:punycode";
+
 const APEX_PUNY = "xn--6qqw6az48blo2b.com"; // 你是傻逼.com 的 punycode
 const APEX_UNICODE = "你是傻逼.com";
 const MAX_NAME_LEN = 63; // 单个 DNS label 上限
@@ -75,9 +77,7 @@ function getName(hostname) {
   // 如果是 punycode（xn-- 开头），解码回中文
   if (label.startsWith("xn--")) {
     try {
-      // 用 URL API 解码 punycode（浏览器和 Worker 环境都支持）
-      const decoded = new URL(`http://${label}.com`).hostname.split(".")[0];
-      label = decoded;
+      label = toUnicode(label);
     } catch (e) {
       // 解码失败，保持原样
     }
