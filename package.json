@@ -1,0 +1,14 @@
+{
+  "name": "nishishabi-worker",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "你是傻逼.com — 动态二级域名「奖状」Cloudflare Worker",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "^4"
+  }
+}

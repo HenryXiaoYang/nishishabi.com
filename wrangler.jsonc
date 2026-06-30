@@ -1,0 +1,17 @@
+{
+  // Worker 名必须是 ASCII，Cloudflare 不接受中文名
+  "name": "nishishabi",
+  "main": "src/index.js",
+  "compatibility_date": "2025-06-01",
+
+  // 通配路由：单个 Worker 接管所有二级域名 + apex
+  // wrangler 接受 Unicode 的 pattern / zone_name，部署时自动转 punycode
+  "routes": [
+    { "pattern": "*.你是傻逼.com/*", "zone_name": "你是傻逼.com" },
+    { "pattern": "你是傻逼.com/*", "zone_name": "你是傻逼.com" }
+  ],
+
+  "observability": {
+    "enabled": true
+  }
+}
