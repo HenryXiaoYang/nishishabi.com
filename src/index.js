@@ -45,6 +45,7 @@ export default {
 /**
  * 从 hostname 解析出二级域名前缀。
  * apex / www / 解析失败 → 返回 null（渲染首页）。
+ * 支持中文子域名（自动解码 punycode）。
  */
 function getName(hostname) {
   let host = (hostname || "").toLowerCase().split(":")[0];
@@ -66,10 +67,21 @@ function getName(hostname) {
   if (prefix === null || prefix === "") return null;
 
   // 只取最左 label，忽略更深层级（a.b.你是傻逼.com → "a"）
-  const label = prefix.split(".")[0];
+  let label = prefix.split(".")[0];
 
   if (label === "www" || label.length === 0) return null;
   if (label.length > MAX_NAME_LEN) return null;
+
+  // 如果是 punycode（xn-- 开头），解码回中文
+  if (label.startsWith("xn--")) {
+    try {
+      // 用 URL API 解码 punycode（浏览器和 Worker 环境都支持）
+      const decoded = new URL(`http://${label}.com`).hostname.split(".")[0];
+      label = decoded;
+    } catch (e) {
+      // 解码失败，保持原样
+    }
+  }
 
   return label;
 }
@@ -298,11 +310,9 @@ function shell({ title, body, footer }) {
   <script>
   (function () {
     function go(v) {
-      var name = (v || "").trim().toLowerCase()
-        .replace(/[^a-z0-9-]/g, "-")   // 仅保留 DNS 合法字符
-        .replace(/^-+|-+$/g, "")
-        .slice(0, ${MAX_NAME_LEN});
-      if (!name) { alert("请输入一个名字（字母/数字）"); return; }
+      var name = (v || "").trim();
+      if (!name) { alert("请输入一个名字"); return; }
+      // 浏览器会自动把中文域名转成 punycode，直接跳转即可
       location.href = "https://" + name + ".${APEX_UNICODE}";
     }
     var inp = document.getElementById("nameInput");
