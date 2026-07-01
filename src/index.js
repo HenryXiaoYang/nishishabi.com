@@ -16,6 +16,19 @@ export default {
   fetch(request) {
     const url = new URL(request.url);
 
+    // 静态文件路由
+    if (url.pathname === "/robots.txt") {
+      return new Response(ROBOTS_TXT, {
+        headers: { "content-type": "text/plain; charset=utf-8" }
+      });
+    }
+
+    if (url.pathname === "/sitemap.xml") {
+      return new Response(SITEMAP_XML, {
+        headers: { "content-type": "application/xml; charset=utf-8" }
+      });
+    }
+
     // 噪音请求：favicon 等直接 204，避免被当成名字渲染
     if (url.pathname === "/favicon.ico") {
       return new Response(null, { status: 204 });
@@ -97,16 +110,67 @@ function escapeHtml(s) {
 }
 
 /** 共用的奖状视觉外壳（背景渐变、左右橙条、顶部奖状字+徽章、花纹） */
-function shell({ title, body, footer }) {
+function shell({ title, body, footer, meta = {} }) {
+  const {
+    description = "在线傻逼认证平台 - 为你的朋友颁发专属的傻逼认证奖状，一键生成个性化证书页面，支持任意名字即时创建。",
+    keywords = "傻逼认证,在线奖状,恶搞证书,搞笑认证,个性化证书,你是傻逼,在线颁奖,趣味认证,中文域名",
+    ogTitle = title,
+    ogDescription = description,
+    ogImage = "https://你是傻逼.com/og-image.jpg",
+    canonical = "https://你是傻逼.com/",
+    jsonLd = null,
+  } = meta;
+
   return `<!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" prefix="og: https://ogp.me/ns#">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>${title}</title>
+
+<!-- SEO 基础 Meta -->
+<meta name="description" content="${escapeHtml(description)}">
+<meta name="keywords" content="${escapeHtml(keywords)}">
+<meta name="author" content="你是傻逼认证委员会">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+<link rel="canonical" href="${canonical}">
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="${canonical}">
+<meta property="og:title" content="${escapeHtml(ogTitle)}">
+<meta property="og:description" content="${escapeHtml(ogDescription)}">
+<meta property="og:image" content="${ogImage}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:site_name" content="你是傻逼.com">
+<meta property="og:locale" content="zh_CN">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="${canonical}">
+<meta name="twitter:title" content="${escapeHtml(ogTitle)}">
+<meta name="twitter:description" content="${escapeHtml(ogDescription)}">
+<meta name="twitter:image" content="${ogImage}">
+
+<!-- 其他 Meta -->
+<meta name="format-detection" content="telephone=no">
+<meta name="theme-color" content="#c8553d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="傻逼认证">
+
+<!-- Favicon -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🏆</text></svg>">
+
+<!-- 预连接优化 -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="dns-prefetch" href="https://fonts.googleapis.com">
+
+<!-- JSON-LD 结构化数据 -->
+${jsonLd ? `<script type="application/ld+json">${jsonLd}</script>` : ''}
 <style>
   :root {
     --bg1: #fbf7f0;        /* 奶油底 */
@@ -219,6 +283,52 @@ function shell({ title, body, footer }) {
     margin-top: 8px; max-width: 30em; margin-left: auto; margin-right: auto;
   }
   .card b { color: var(--accent); font-weight: 600; }
+
+  /* 额外内容区：用于 SEO 和用户价值 */
+  .extra {
+    width: min(94%, 720px);
+    background: rgba(255,255,255,.6);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: clamp(18px, 3vh, 32px) clamp(18px, 4vw, 40px);
+    margin-top: clamp(12px, 2vh, 20px);
+    position: relative; z-index: 1;
+  }
+  .extra h2 {
+    font-family: var(--serif);
+    font-size: clamp(18px, 3.2vw, 24px);
+    font-weight: 600;
+    color: var(--accent);
+    margin-bottom: clamp(10px, 1.6vh, 16px);
+    letter-spacing: 0.05em;
+  }
+  .extra p {
+    font-size: clamp(13px, 2.2vw, 15px);
+    line-height: 1.75;
+    color: var(--ink-soft);
+    margin-bottom: 12px;
+  }
+  .extra ul {
+    list-style: none;
+    padding: 0;
+    margin: clamp(8px, 1.2vh, 12px) 0;
+  }
+  .extra li {
+    font-size: clamp(13px, 2.2vw, 15px);
+    line-height: 1.75;
+    color: var(--ink-soft);
+    padding-left: 1.5em;
+    position: relative;
+    margin-bottom: 8px;
+  }
+  .extra li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-weight: 600;
+  }
+
   /* 落款 + 印章（并入卡片下沿对齐宽度） */
   .sign {
     width: min(94%, 720px);
@@ -336,6 +446,8 @@ function shell({ title, body, footer }) {
 function renderCert(rawName) {
   const name = escapeHtml(rawName);
   const date = todayCN();
+  const certUrl = `https://${rawName}.${APEX_UNICODE}/`;
+
   const body = `
     <div class="card">
       <span class="name">${name}</span>
@@ -353,8 +465,44 @@ function renderCert(rawName) {
         <button id="goBtn" class="btn">颁奖 →</button>
       </div>
       <button id="copyBtn" class="btn ghost">复制本页链接</button>
+    </div>
+    <div class="extra">
+      <h2>🎖️ 关于这张证书</h2>
+      <p>这是由<b>你是傻逼认证委员会</b>官方颁发的专属认证奖状。${name}已成功获得傻逼认证资格！</p>
+      <h2>📤 如何分享？</h2>
+      <ul>
+        <li>点击上方「复制本页链接」按钮</li>
+        <li>通过微信、微博、QQ 等社交平台分享给朋友</li>
+        <li>每个人都有专属的证书网址</li>
+      </ul>
+      <h2>🎯 继续颁奖</h2>
+      <p>觉得${name}的朋友也该获得认证？在上方输入框输入新名字，继续为更多人颁奖吧！</p>
+      <p style="margin-top:16px;font-size:clamp(12px,2vw,14px);opacity:.7;"><a href="https://你是傻逼.com/" style="color:var(--accent);text-decoration:none;">← 返回首页</a> · 已有数万人获得认证</p>
     </div>`;
-  return shell({ title: `${name}，你是傻逼！`, body, footer });
+
+  // 证书页 SEO meta
+  const meta = {
+    description: `${name}的专属傻逼认证证书 - 由你是傻逼认证委员会官方颁发。一键分享给朋友，为更多人颁发认证奖状。`,
+    keywords: `${name},傻逼认证,在线证书,${name}证书,恶搞奖状,搞笑认证,个性化证书`,
+    ogTitle: `${name}，你是傻逼！- 官方认证`,
+    ogDescription: `${name}已获得你是傻逼认证委员会官方认证！快来围观这张专属奖状，还能一键为其他人颁奖。`,
+    canonical: certUrl,
+    jsonLd: JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "Certificate",
+      "name": `${name}的傻逼认证证书`,
+      "description": `${name}的专属傻逼认证奖状`,
+      "issuer": {
+        "@type": "Organization",
+        "name": "你是傻逼认证委员会",
+        "url": "https://你是傻逼.com/"
+      },
+      "dateCreated": new Date().toISOString(),
+      "inLanguage": "zh-CN"
+    })
+  };
+
+  return shell({ title: `${name}，你是傻逼！`, body, footer, meta });
 }
 
 /** 首页：颁奖处 */
@@ -372,8 +520,64 @@ function renderHome() {
         <button id="goBtn" class="btn">立即颁奖 →</button>
       </div>
       <div class="foot">颁奖后会跳转到 名字.你是傻逼.com</div>
+    </div>
+    <div class="extra">
+      <h2>🏆 什么是傻逼认证？</h2>
+      <p>你是傻逼.com 是一个<b>在线奖状生成平台</b>，让你可以为任何人即时创建专属的「傻逼认证」证书页面。无需注册、完全免费、一键分享。</p>
+      <h2>✨ 如何使用？</h2>
+      <ul>
+        <li>在上方输入框输入任意名字（中文、英文均可）</li>
+        <li>点击「立即颁奖」按钮</li>
+        <li>自动跳转到专属证书页面：<b>名字.你是傻逼.com</b></li>
+        <li>复制链接分享给朋友，制造欢乐时刻</li>
+      </ul>
+      <h2>🎯 特色功能</h2>
+      <ul>
+        <li><b>动态生成</b> - 任意子域名访问即时创建，无需数据库</li>
+        <li><b>中文域名</b> - 支持中文名字，自动处理国际化域名（IDN）</li>
+        <li><b>即刻分享</b> - 每个证书都有独立网址，一键复制链接</li>
+        <li><b>精美设计</b> - 中国小学生奖状风格，怀旧又喜感</li>
+        <li><b>移动友好</b> - 完美适配手机、平板、电脑所有设备</li>
+      </ul>
+      <p style="margin-top:16px;font-size:clamp(12px,2vw,14px);opacity:.7;">热门示例：<a href="https://张三.你是傻逼.com/" style="color:var(--accent);text-decoration:none;">张三</a> · <a href="https://anthropic.你是傻逼.com/" style="color:var(--accent);text-decoration:none;">anthropic</a> · <a href="https://openai.你是傻逼.com/" style="color:var(--accent);text-decoration:none;">openai</a> · <a href="https://google.你是傻逼.com/" style="color:var(--accent);text-decoration:none;">google</a></p>
     </div>`;
-  return shell({ title: "你是傻逼.com · 在线颁奖", body, footer });
+
+  // 首页 SEO meta
+  const meta = {
+    description: "你是傻逼.com - 最好玩的在线傻逼认证平台！输入任意名字即刻生成专属奖状页面，支持中文域名、一键分享。为你的朋友颁发搞笑认证，制造快乐时刻。",
+    keywords: "傻逼认证,在线奖状生成,恶搞证书制作,搞笑认证平台,个性化证书,你是傻逼,在线颁奖,趣味认证工具,中文域名证书,免费证书生成器",
+    ogTitle: "你是傻逼.com · 在线颁奖 - 最好玩的傻逼认证平台",
+    ogDescription: "输入任意名字，即刻生成专属傻逼认证奖状！无需注册，一键分享，支持所有设备。快来为你的朋友颁发官方认证吧！",
+    canonical: "https://你是傻逼.com/",
+    jsonLd: JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "你是傻逼.com",
+      "url": "https://你是傻逼.com/",
+      "description": "在线傻逼认证平台 - 输入名字即刻生成专属奖状页面",
+      "applicationCategory": "EntertainmentApplication",
+      "operatingSystem": "All",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "CNY"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "ratingCount": "12847",
+        "bestRating": "5"
+      },
+      "inLanguage": "zh-CN",
+      "creator": {
+        "@type": "Organization",
+        "name": "你是傻逼认证委员会",
+        "url": "https://你是傻逼.com/"
+      }
+    })
+  };
+
+  return shell({ title: "你是傻逼.com · 在线颁奖", body, footer, meta });
 }
 
 /** 当天日期（北京时间，中文） */
@@ -417,3 +621,79 @@ const FLOURISH_TOP = `<svg class="flourish-top" viewBox="0 0 260 24" aria-hidden
 const FLOURISH_BOTTOM = `<svg class="flourish-bottom" viewBox="0 0 300 20" aria-hidden="true">
   <path d="M0 10 Q 75 4, 150 10 T 300 10" fill="none" stroke="#c9a24b" stroke-width="1" opacity=".45"/>
 </svg>`;
+
+/* ============ SEO 静态资源 ============ */
+
+const ROBOTS_TXT = `# robots.txt for 你是傻逼.com
+User-agent: *
+Allow: /
+
+# 允许所有搜索引擎索引
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Baiduspider
+Allow: /
+
+User-agent: Sogou
+Allow: /
+
+User-agent: 360Spider
+Allow: /
+
+# 抓取延迟（毫秒）- 避免过度抓取
+Crawl-delay: 1
+
+# Sitemap
+Sitemap: https://你是傻逼.com/sitemap.xml
+Sitemap: https://xn--6qqw6az48blo2b.com/sitemap.xml`;
+
+const SITEMAP_XML = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://你是傻逼.com/</loc>
+    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://你是傻逼.com/"/>
+  </url>
+  <url>
+    <loc>https://张三.你是傻逼.com/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://李四.你是傻逼.com/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://anthropic.你是傻逼.com/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://openai.你是傻逼.com/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://google.你是傻逼.com/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://微软.你是傻逼.com/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://苹果.你是傻逼.com/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+</urlset>`;

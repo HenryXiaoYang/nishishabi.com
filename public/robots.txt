@@ -1,0 +1,26 @@
+# robots.txt for 你是傻逼.com
+User-agent: *
+Allow: /
+
+# 允许所有搜索引擎索引
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Baiduspider
+Allow: /
+
+User-agent: Sogou
+Allow: /
+
+User-agent: 360Spider
+Allow: /
+
+# 抓取延迟（毫秒）- 避免过度抓取
+Crawl-delay: 1
+
+# Sitemap
+Sitemap: https://你是傻逼.com/sitemap.xml
+Sitemap: https://xn--6qqw6az48blo2b.com/sitemap.xml
