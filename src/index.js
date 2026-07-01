@@ -284,51 +284,6 @@ ${jsonLd ? `<script type="application/ld+json">${jsonLd}</script>` : ''}
   }
   .card b { color: var(--accent); font-weight: 600; }
 
-  /* 额外内容区：用于 SEO 和用户价值 */
-  .extra {
-    width: min(94%, 720px);
-    background: rgba(255,255,255,.6);
-    border: 1px solid var(--line);
-    border-radius: 16px;
-    padding: clamp(18px, 3vh, 32px) clamp(18px, 4vw, 40px);
-    margin-top: clamp(12px, 2vh, 20px);
-    position: relative; z-index: 1;
-  }
-  .extra h2 {
-    font-family: var(--serif);
-    font-size: clamp(18px, 3.2vw, 24px);
-    font-weight: 600;
-    color: var(--accent);
-    margin-bottom: clamp(10px, 1.6vh, 16px);
-    letter-spacing: 0.05em;
-  }
-  .extra p {
-    font-size: clamp(13px, 2.2vw, 15px);
-    line-height: 1.75;
-    color: var(--ink-soft);
-    margin-bottom: 12px;
-  }
-  .extra ul {
-    list-style: none;
-    padding: 0;
-    margin: clamp(8px, 1.2vh, 12px) 0;
-  }
-  .extra li {
-    font-size: clamp(13px, 2.2vw, 15px);
-    line-height: 1.75;
-    color: var(--ink-soft);
-    padding-left: 1.5em;
-    position: relative;
-    margin-bottom: 8px;
-  }
-  .extra li::before {
-    content: "✓";
-    position: absolute;
-    left: 0;
-    color: var(--accent);
-    font-weight: 600;
-  }
-
   /* 落款 + 印章（并入卡片下沿对齐宽度） */
   .sign {
     width: min(94%, 720px);
@@ -465,19 +420,6 @@ function renderCert(rawName) {
         <button id="goBtn" class="btn">颁奖 →</button>
       </div>
       <button id="copyBtn" class="btn ghost">复制本页链接</button>
-    </div>
-    <div class="extra">
-      <h2>🎖️ 关于这张证书</h2>
-      <p>这是由<b>你是傻逼认证委员会</b>官方颁发的专属认证奖状。${name}已成功获得傻逼认证资格！</p>
-      <h2>📤 如何分享？</h2>
-      <ul>
-        <li>点击上方「复制本页链接」按钮</li>
-        <li>通过微信、微博、QQ 等社交平台分享给朋友</li>
-        <li>每个人都有专属的证书网址</li>
-      </ul>
-      <h2>🎯 继续颁奖</h2>
-      <p>觉得${name}的朋友也该获得认证？在上方输入框输入新名字，继续为更多人颁奖吧！</p>
-      <p style="margin-top:16px;font-size:clamp(12px,2vw,14px);opacity:.7;"><a href="https://你是傻逼.com/" style="color:var(--accent);text-decoration:none;">← 返回首页</a> · 已有数万人获得认证</p>
     </div>`;
 
   // 证书页 SEO meta
@@ -520,26 +462,6 @@ function renderHome() {
         <button id="goBtn" class="btn">立即颁奖 →</button>
       </div>
       <div class="foot">颁奖后会跳转到 名字.你是傻逼.com</div>
-    </div>
-    <div class="extra">
-      <h2>🏆 什么是傻逼认证？</h2>
-      <p>你是傻逼.com 是一个<b>在线奖状生成平台</b>，让你可以为任何人即时创建专属的「傻逼认证」证书页面。无需注册、完全免费、一键分享。</p>
-      <h2>✨ 如何使用？</h2>
-      <ul>
-        <li>在上方输入框输入任意名字（中文、英文均可）</li>
-        <li>点击「立即颁奖」按钮</li>
-        <li>自动跳转到专属证书页面：<b>名字.你是傻逼.com</b></li>
-        <li>复制链接分享给朋友，制造欢乐时刻</li>
-      </ul>
-      <h2>🎯 特色功能</h2>
-      <ul>
-        <li><b>动态生成</b> - 任意子域名访问即时创建，无需数据库</li>
-        <li><b>中文域名</b> - 支持中文名字，自动处理国际化域名（IDN）</li>
-        <li><b>即刻分享</b> - 每个证书都有独立网址，一键复制链接</li>
-        <li><b>精美设计</b> - 中国小学生奖状风格，怀旧又喜感</li>
-        <li><b>移动友好</b> - 完美适配手机、平板、电脑所有设备</li>
-      </ul>
-      <p style="margin-top:16px;font-size:clamp(12px,2vw,14px);opacity:.7;">热门示例：<a href="https://张三.你是傻逼.com/" style="color:var(--accent);text-decoration:none;">张三</a> · <a href="https://anthropic.你是傻逼.com/" style="color:var(--accent);text-decoration:none;">anthropic</a> · <a href="https://openai.你是傻逼.com/" style="color:var(--accent);text-decoration:none;">openai</a> · <a href="https://google.你是傻逼.com/" style="color:var(--accent);text-decoration:none;">google</a></p>
     </div>`;
 
   // 首页 SEO meta
